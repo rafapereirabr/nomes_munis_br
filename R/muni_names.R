@@ -1,6 +1,9 @@
 library(geobr)
 library(data.table)
 library(ggplot2)
+library(ggpointdensity)
+library(viridisLite)
+library(sfheaders)
 library(sf)
 
 `%nin%` <- Negate(`%in%`)
@@ -180,8 +183,16 @@ c <- subset(munis, name_origen =='Other')
 
 
 
+
+
+########### prepare Plot data ------------------------------------------------------------------
+
 # back to sf
 munis_sf <- st_sf(munis)
+
+# data frame
+munis_df <- sfheaders::sf_to_df(munis,fill = T)
+
 
 ########### Plot ------------------------------------------------------------------
 
@@ -196,3 +207,18 @@ temp_fig <- ggplot() +
 ggsave(temp_fig, filename = './figures/name_origins_municipalities_br.png',
        width = 16, height = 16, units = 'cm', dpi=200)
 
+
+##### point density
+
+temp_fig2 <- ggplot() +
+            geom_sf(data=states, color='gray', fill='gray95', size=.2) +
+            geom_pointdensity(data=munis_df, aes(x=x,y=y), size=.1, alpha=.5) +
+            facet_wrap(.~name_origen) +
+            scale_color_viridis_c() +
+            theme_void() +
+            theme(legend.position = "none")
+
+ggsave(temp_fig2, filename = './figures/name_origins_municipalities_br_denisty.png',
+       width = 16, height = 16, units = 'cm', dpi=200)
+
+  
