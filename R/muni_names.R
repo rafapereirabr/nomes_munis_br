@@ -300,6 +300,7 @@ nat <- c(
   'Mangabeira',
   'Limoei',
   'Madeir',
+  'Maripá',
   'alho', 'Alho',
   'Capinzal', 'Capim', 'Capinópolis',
   'Espinh',
@@ -593,5 +594,5 @@ nrow( subset(munis, name_muni %like% 'Rio|Ribeir' ) ) / nrow(munis)
 # cidades colônias
 nrow( subset(munis, name_muni %like% 'Nova|Novo' ) ) / nrow(munis)
 
-
+subset(munis, name_muni %like% 'Maripá' )
 
