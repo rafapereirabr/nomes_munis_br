@@ -125,7 +125,7 @@ ind_conf <- munis[ name_muni %like% ind_conf]$code_muni
 code_ind <- code_ind[code_ind %nin% ind_conf]
 
 length(code_ind)
-#> 1914
+#> 1915
 
 
 
@@ -430,6 +430,8 @@ munis[, name_nat := fifelse(code_muni %in% code_nat, 'Nat', '') ]
 munis[, name_origin := paste0(name_ind, name_rel, name_nat, collapse = '-'), by=code_muni]
 munis[, name_origin := fifelse(name_origin == '', 'Other', name_origin) ]
 
+# !!!!!!!!!!!! ####### recodficar / coririgr "Valparaíso De Goiás"
+
 
 head(munis)                      
 # munis[, name_indrel := fifelse(name_rel==1 & name_ind==1, 1, 0) ]
@@ -447,6 +449,17 @@ b <- subset(munis, name_origin =='Ind')
 c <- subset(munis, name_origin =='')
 
 
+
+########### numbers ------------------------------------------------------------------
+
+# proportion of municipalities with indigenous names
+nrow(subset(munis, name_origin %like% 'Ind')) / nrow(munis)
+
+# proportion of municipalities with religious names
+nrow(subset(munis, name_origin %like% 'Rel')) / nrow(munis)
+
+# proportion of municipalities with religious names
+nrow(subset(munis, name_origin %like% 'Nat')) / nrow(munis)
 
 
 ########### prepare Plot data ------------------------------------------------------------------
