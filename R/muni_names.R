@@ -153,6 +153,8 @@ rel <- c(  'Abadi'
            , 'Nossa'
            , 'Oratório'
            , 'Padre'
+           , 'Pastor'
+           , 'Pastora'
            , 'Paraíso'
            , 'Pio'
            , 'Redentor' 
@@ -184,7 +186,17 @@ length(code_rel)
 pol1 <- c('Presidente', 'Senador', 'Senadora', 
           'Deputado', 'Deputada', 
           'Prefeito', 'Prefeita',
+          'Juiz', 'Juiza',
           'Embaixador', 'Embaixadora', 'Embaixatriz' )
+
+
+
+# build unifying search term
+search_pol1 <- paste0(pol1, collapse = '|')
+
+# get code of all municipalities with religious names
+code_pol1 <- subset(munis, name_muni %like% search_pol1)$code_muni
+
 
 ########### Military / nobility name origins  ------------------------------------------------------------------
 
