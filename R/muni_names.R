@@ -18,6 +18,7 @@ munis <- read_municipal_seat()
 setDT(munis)
 
 
+########### Load name identifiers and search terms ------------------------------------------------------------------
 
 
 ########### Indigenous names ------------------------------------------------------------------
@@ -89,44 +90,37 @@ suf <- c('aba', 'abã', 'abi', 'abu', 'aca', 'açá', 'aci', 'açu', 'acy', 'ahy
          'ussu', 'uí', 'uiú', 'ujá', 'umbi', 'uoca',
          'uá', 'úna', 'upi', 'urá', 'uré', 'uri', 'uru', 'uti', 
          'xim'
-         )
+)
 
-
-
-
-
-
-
-
-
-# at the start
-munis[ grepl('Caxi',  name_muni ) ]$name_muni
-
-# at the end
-munis[ grepl('rupu\\b',  name_muni ) ]$name_muni |> sort()
-
+# ## quick searches
+# # at the start
+# munis[ grepl('Caxi',  name_muni ) ]$name_muni
+# 
+# # at the end
+# munis[ grepl('rupu\\b',  name_muni ) ]$name_muni |> sort()
+# 
 
 
 # build unifying search term for muni names starting in pre
-  search_pre <- paste0(pre, collapse = '|')
+search_pre <- paste0(pre, collapse = '|')
 
 # build unifying search term for muni names ending in suf
-  search_suf <- paste0(suf, collapse = '\\b|')
-  search_suf <- paste0(search_suf, '\\b')
-  
+search_suf <- paste0(suf, collapse = '\\b|')
+search_suf <- paste0(search_suf, '\\b')
+
 # get municipality codes starting in pre OR ending in suf
 code_suf <- munis[ grepl(search_suf,  name_muni ) ]$code_muni
 code_pre <- munis[ grepl(search_pre,  name_muni ) ]$code_muni
 code_ind <- unique(c(code_pre, code_suf))
 
 # avoid confusion, removing dubious city names
-ind_conf <- c('Paraíso')
-ind_conf <- munis[ name_muni %like% ind_conf]$code_muni
+ind_conf <- c('Paraíso', 'Valparaíso')
+ind_conf <- munis[grepl(paste(ind_conf, collapse='|'), name_muni)]$code_muni
 code_ind <- code_ind[code_ind %nin% ind_conf]
 
-length(code_ind)
-#> 1915
 
+length(code_ind)
+#> 1914
 
 
 
@@ -135,44 +129,40 @@ length(code_ind)
 
 # all search terms
 rel <- c(  'Abadi' 
-         , 'Aparecida'
-         , 'Belém'
-         , 'Bonfim'
-         , 'Canaã'
-         , 'Capela', 'Capelinha'
-         , 'Cristo'
-         , 'Cruz'
-         , 'Cruzes'
-         , 'Divin'
-         , 'Frei'
-         , 'Galiléia'
-         , 'Igrej'
-         , 'Jericó'
-         , 'Jesus'
-         , 'Jordão'
-         , 'Maria'
-         , 'Mesquita'
-         , 'Milagre'
-         , 'Missões'
-         , 'Natal'
-         , 'Nazaré', 'Nazareno'
-         , 'Nossa'
-         , 'Oratório'
-         , 'Padre'
-         , 'Paraíso'
-         , 'Pio'
-         , 'Redentor' 
-         , 'Romaria'
-         , 'Salvador'
-         , 'Santa'
-         , 'Santo'
-         , 'São'
-         , 'Trindade'
-         )
-
-
-
-
+           , 'Aparecida'
+           , 'Belém'
+           , 'Bonfim'
+           , 'Canaã'
+           , 'Capela', 'Capelinha'
+           , 'Cristo'
+           , 'Cruz'
+           , 'Cruzes'
+           , 'Divin'
+           , 'Frei'
+           , 'Galiléia'
+           , 'Igrej'
+           , 'Jericó'
+           , 'Jesus'
+           , 'Jordão'
+           , 'Maria'
+           , 'Mesquita'
+           , 'Milagre'
+           , 'Missões'
+           , 'Natal'
+           , 'Nazaré', 'Nazareno'
+           , 'Nossa'
+           , 'Oratório'
+           , 'Padre'
+           , 'Paraíso'
+           , 'Pio'
+           , 'Redentor' 
+           , 'Romaria'
+           , 'Salvador'
+           , 'Santa'
+           , 'Santo'
+           , 'São'
+           , 'Trindade'
+)
 
 
 # build unifying search term
@@ -184,13 +174,29 @@ length(code_rel)
 #> 827
 
 
-########### Political or Military name origins ------------------------------------------------------------------
 
-pol <- c(
-  'Presidente', 'Senador', 'Deputado', 'Embaixador', 
-  'Barão', 'Duque',
-  'Marechal', 'General', 'Coronel', 'Sargento', 'capitão', 'Comandante', 'Tenente', 'Soldado'
-  )
+
+########### Political name origins ------------------------------------------------------------------
+#' !!!!! There many cities named after politicians. However, it is quite
+#' hard to automatically differentiate cities named after politicians from cities named
+#' after other professions.
+
+pol1 <- c('Presidente', 'Senador', 'Senadora', 
+          'Deputado', 'Deputada', 
+          'Prefeito', 'Prefeita',
+          'Embaixador', 'Embaixadora', 'Embaixatriz' )
+
+########### Military / nobility name origins  ------------------------------------------------------------------
+
+pol <- c( 'Rei', 'Rainha', 'Barão',  'Baronesa', 
+          'Conde', 'Condeza', 'Visconde', 
+          'Duque', 'Duquesa', 
+          'Imperador', 'Imperatriz',
+          
+          'Marechal', 'General', 'Coronel', 
+          'Sargento', 'capitão', 
+          'Comandante', 'Tenente', 'Soldado'
+        )
 
 subset(munis, name_muni %like% 'Dom ')
 
@@ -200,213 +206,214 @@ search_pol <- paste0(pol, collapse = '|')
 # get code of all municipalities with religious names
 code_pol <- subset(munis, name_muni %like% search_pol)$code_muni
 length(code_pol)
-#> 85
+#> 51
+
 
 
 ########### Nature name origins ------------------------------------------------------------------
 
 nat <- c(
-          # physical geography ish
-          'Alto', 'Alta', 'Areal',
-          'Água', 'água',
-          'Barreir','Barra', 'Barrinha',
-          'Bahia', 'Baía' , 'Enseada', 'Cabo', 'Estreito', 'Bebedouro',
-          'Cachoeir', 'Queda',
-          'Morro', 'Morrinho', 'Monte', 'Montanha', 'Serra', 'Serrinha','Serrolândia',
-          'Colina', 'Pico',
-          'Pedra', 'Pedreira', 'Pedrinha', 'Rocha',
-          'Rio', 'Riach', 'Ribeir', 'Brejo', 'Brejinho', 'Brejão','Brejões', 'Curralinho',
-          'Córrego' , 'Lago', 'Alagoa', 'Fonte' ,
-          'Mata', 'Matinha', 'Matão', 'Matões', 'Mato', 'Campo', 'Vargem', 'Vargi', 'Varjã',
-          'Chapad',
-          'Praia', 'Prainha',
-          'Ilh',
-          'Jardim',
-          'Vista', 'Horizonte',
-          'Monção',
-          'Baixio',
-          'Poço', 'Pocinhos',
-          'Campina', 'Prado', 'Campestre',
-          'Cating',
-          'Sertão',
-          'Várzea', 'Varzelân',
-          'Vereda', 'Veredinha', 'Gramado' ,
-          'Vazante',
-          'Recife',
-          'Serrita',
-          'Mar ',
-          'Maresia',
-          'Vieira',
-          'Videira',
-          'Fundão',
-          'Arroio',
-          'Aurora',
-          'Balneário' ,
-          'Cerro' ,
-          'Mormaço',
-          'Morrinhos' ,
-          'Sertão',
-          'Duna',
-          'Sol',
-          'Lua',
-          'Corguinho',
-          'Rochedo',
-          
-          # trees and fruits
-          'Angico',
-          'Babaçu',
-          'Cereje',
-          'Cacau',
-          'Espigã',
-          'Espig',
-          'Castanhei',
-          'Cacoal',
-          'Piment',
-          'Seringu',
-          'Castanh',
-          'Figueir',
-          'Oliveir',
-          'Palmeir',
-          'Pequi',
-          'Axixá',
-          'Cedral',
-          'Mirinzal',
-          'Pinheiro',
-          'Rosári', 'Rosal',
-          'Agricol', 'Agrolând', 'Agronôm',
-          'Canavi',
-          'Cafe', 'Café',
-          'Açaí', 'Açail',
-          'Cocal', 'Cocais',
-          'Mangabeira',
-          'Limoei',
-          'Madeir',
-          'alho', 'Alho',
-          'Capinzal', 'Capim', 'Capinópolis',
-          'Espinh',
-          'Flor ', 'Flores' ,
-          'Aroeiras',
-          'Bananeir', 'Bananal',
-          'Cedro',
-          'Flores', 'Flora',
-          'Jaqueira', 'Jaca',
-          'Palmares',
-          'Junqueiro',
-          'Maribondo',
-          'Laranjeiras',
-          'Cipó',
-          'Cocos',
-          'Cana ',
-          'Carvalho',
-          'Araucária',
-          'Folhas',
-          'Floresta',
-          'Frutal',
-          'Laranja',
-          'Lavra', 'Lavrinhas',
-          'Limeira' ,
-          'Lontra',
-          'Paineira',
-          'Palma', 'Palmó',
-          'Pinheir',
-          'Canelinha', 'Canela',
-          'Imbuia',
-          'Alecrim',
-          'Arvore', 'Árvore',
-          'Capão',
-          'Cidreira',
-          'Coqueiro',
-          
-          # animals and insects
-          'Peixe',
-          'Trairão',
-          'Tartarug',
-          'Bagre',
-          'Colméia',
-          'Formigu',
-          'Coelho',
-          'Formig',
-          'Cascavel',
-          'Granj',
-          'Tubar',
-          'Cutia',
-          'Ananá',
-          'Pium',
-          'Raposa', 'Raposo',
-          'Galinho',
-          'Touro',
-          'Pato',
-          'Pombal',
-          'Carneiro',
-          'Cordeir',
-          'Lagarto',
-          'Bois',
-          'Pinhão',
-          'Andorinha',
-          'Anta',
-          'Gavião',
-          'Cantagalo',
-          'Cristais', 'Cristal',
-          'Diamantina',
-          'Águia', 
-          'Papagaio',
-          'Pavão',
-          'Quati',
-          'Cotia',
-          'Cascavel',
-          'Gavião',
-          'Lontra',
-          
-          # Others
-          'Adamantina',
-          'Arco-Íris',
-          'Areia',
-          'Cristal',
-          'Primavera',
-          'Leite',
-          'Barro',
-          'Neves',
-          'Ouro',
-          'Prata', 'Pratinha',
-          'Cristal',
-          'Alvorada', 'Aurora',
-          'Horizonte',
-          'Pau ',
-          'Terra', 'terra',
-          'Hidro',
-          'Salitre',
-          'Saboeiro',
-          'Sítio',
-          'Cacimba',
-          'Estância',
-          'Sítio',
-          'Bicas', 'Biquinhas',
-          'Chácara', 'Chalé',
-          'Ponte',
-          'Porteir',
-          'Salinas',
-          'Castelo',
-          'Linhares',
-          'Conch',
-          'Óleo',
-          'Palhoça',
-          'Pedregulho',
-          'Pinhalzinho',
-          'Planalto',
-          'Pontão',
-          'Pontal',
-          'Pontalinda',
-          'Restinga',
-          'Saltinho',
-          'Salto',
-          'Sertãozinho',
-          'Urânia',
-          'Céu' ,
-          'Cerro',
-          'Palmital',
-          'Palmitos',
-          'Pinhão'
-          )
+  # physical geography ish
+  'Alto', 'Alta', 'Areal',
+  'Água', 'água',
+  'Barreir','Barra', 'Barrinha',
+  'Bahia', 'Baía' , 'Enseada', 'Cabo', 'Estreito', 'Bebedouro',
+  'Cachoeir', 'Queda',
+  'Morro', 'Morrinho', 'Monte', 'Montanha', 'Serra', 'Serrinha','Serrolândia',
+  'Colina', 'Pico',
+  'Pedra', 'Pedreira', 'Pedrinha', 'Rocha',
+  'Rio', 'Riach', 'Ribeir', 'Brejo', 'Brejinho', 'Brejão','Brejões', 'Curralinho',
+  'Córrego' , 'Lago', 'Alagoa', 'Fonte' ,
+  'Mata', 'Matinha', 'Matão', 'Matões', 'Mato', 'Campo', 'Vargem', 'Vargi', 'Varjã',
+  'Chapad',
+  'Praia', 'Prainha',
+  'Ilh',
+  'Jardim',
+  'Vista', 'Horizonte',
+  'Monção',
+  'Baixio',
+  'Poço', 'Pocinhos',
+  'Campina', 'Prado', 'Campestre',
+  'Cating',
+  'Sertão',
+  'Várzea', 'Varzelân',
+  'Vereda', 'Veredinha', 'Gramado' ,
+  'Vazante',
+  'Recife',
+  'Serrita',
+  'Mar ',
+  'Maresia',
+  'Vieira',
+  'Videira',
+  'Fundão',
+  'Arroio',
+  'Aurora',
+  'Balneário' ,
+  'Cerro' ,
+  'Mormaço',
+  'Morrinhos' ,
+  'Sertão',
+  'Duna',
+  'Sol',
+  'Lua',
+  'Corguinho',
+  'Rochedo',
+  
+  # trees and fruits
+  'Angico',
+  'Babaçu',
+  'Cereje',
+  'Cacau',
+  'Espigã',
+  'Espig',
+  'Castanhei',
+  'Cacoal',
+  'Piment',
+  'Seringu',
+  'Castanh',
+  'Figueir',
+  'Oliveir',
+  'Palmeir',
+  'Pequi',
+  'Axixá',
+  'Cedral',
+  'Mirinzal',
+  'Pinheiro',
+  'Rosári', 'Rosal',
+  'Agricol', 'Agrolând', 'Agronôm',
+  'Canavi',
+  'Cafe', 'Café',
+  'Açaí', 'Açail',
+  'Cocal', 'Cocais',
+  'Mangabeira',
+  'Limoei',
+  'Madeir',
+  'alho', 'Alho',
+  'Capinzal', 'Capim', 'Capinópolis',
+  'Espinh',
+  'Flor ', 'Flores' ,
+  'Aroeiras',
+  'Bananeir', 'Bananal',
+  'Cedro',
+  'Flores', 'Flora',
+  'Jaqueira', 'Jaca',
+  'Palmares',
+  'Junqueiro',
+  'Maribondo',
+  'Laranjeiras',
+  'Cipó',
+  'Cocos',
+  'Cana ',
+  'Carvalho',
+  'Araucária',
+  'Folhas',
+  'Floresta',
+  'Frutal',
+  'Laranja',
+  'Lavra', 'Lavrinhas',
+  'Limeira' ,
+  'Lontra',
+  'Paineira',
+  'Palma', 'Palmó',
+  'Pinheir',
+  'Canelinha', 'Canela',
+  'Imbuia',
+  'Alecrim',
+  'Arvore', 'Árvore',
+  'Capão',
+  'Cidreira',
+  'Coqueiro',
+  'Palmital',
+  'Palmitos',
+  'Pinhão',
+  
+  # animals and insects
+  'Peixe',
+  'Piranha',
+  'Trairão',
+  'Tartarug',
+  'Bagre',
+  'Colméia',
+  'Formigu',
+  'Coelho',
+  'Formig',
+  'Cascavel',
+  'Granj',
+  'Tubar',
+  'Cutia',
+  'Ananá',
+  'Pium',
+  'Raposa', 'Raposo',
+  'Galinho',
+  'Touro',
+  'Pato',
+  'Pombal',
+  'Carneiro',
+  'Cordeir',
+  'Lagarto',
+  'Bois',
+  'Pinhão',
+  'Andorinha',
+  'Anta',
+  'Gavião',
+  'Cantagalo',
+  'Cristais', 'Cristal',
+  'Diamantina',
+  'Águia', 
+  'Papagaio',
+  'Pavão',
+  'Quati',
+  'Cotia',
+  'Cascavel',
+  'Gavião',
+  'Lontra',
+  
+  # Others
+  'Adamantina',
+  'Arco-Íris',
+  'Areia',
+  'Cristal',
+  'Primavera',
+  'Leite',
+  'Barro',
+  'Neves',
+  'Ouro',
+  'Prata', 'Pratinha',
+  'Cristal',
+  'Alvorada', 'Aurora',
+  'Horizonte',
+  'Pau ',
+  'Terra', 'terra',
+  'Hidro',
+  'Salitre',
+  'Saboeiro',
+  'Cacimba',
+  'Deserto',
+  'Estância',
+  'Sítio', 'Chácara', 'Chalé',
+  'Bicas', 'Biquinhas',
+  'Ponte',
+  'Porteir',
+  'Salinas',
+  'Castelo',
+  'Linhares',
+  'Conch',
+  'Óleo',
+  'Palhoça',
+  'Pedregulho',
+  'Pinhalzinho',
+  'Planalto',
+  'Pontão',
+  'Pontal',
+  'Pontalinda',
+  'Restinga',
+  'Saltinho',
+  'Salto',
+  'Sertãozinho',
+  'Urânia',
+  'Céu' ,
+  'Cerro'
+  )
 
 
 
@@ -419,34 +426,26 @@ code_nat <- subset(munis, name_muni %like% search_nat)$code_muni
 
 subset(munis, name_muni %like% "Flora")$name_muni |> sort()
 length(code_nat)
-#>  1315
+#>  1320
 
 
-########### Recode ------------------------------------------------------------------
+########### Classify municipality names ------------------------------------------------------------------
 
 munis[, name_ind := fifelse(code_muni %in% code_ind, 'Ind', '') ]
 munis[, name_rel := fifelse(code_muni %in% code_rel, 'Rel', '') ]
 munis[, name_nat := fifelse(code_muni %in% code_nat, 'Nat', '') ]
 munis[, name_origin := paste0(name_ind, name_rel, name_nat, collapse = '-'), by=code_muni]
 munis[, name_origin := fifelse(name_origin == '', 'Other', name_origin) ]
-
-# !!!!!!!!!!!! ####### recodficar / coririgr "Valparaíso De Goiás"
-
-
 head(munis)                      
-# munis[, name_indrel := fifelse(name_rel==1 & name_ind==1, 1, 0) ]
-# 
-# munis[, name_origin := fcase(name_indrel==1, 'Indig-Relig',
-#                              name_rel ==1, "Relig.", 
-#                              name_ind ==1, "Indig.",
-#                              default = 'Other')]
-                                 
+
+                          
 
 # check
 table(munis$name_origin)
-a <- subset(munis, name_origin =='IndRel')
-b <- subset(munis, name_origin =='Ind')
-c <- subset(munis, name_origin =='')
+a <- subset(munis, name_origin %like% 'Ind')
+b <- subset(munis, name_origin %like% 'Rel')
+c <- subset(munis, name_origin %like% 'Nat')
+d <- subset(munis, name_origin %like% 'Other')
 
 
 
@@ -461,8 +460,27 @@ nrow(subset(munis, name_origin %like% 'Rel')) / nrow(munis)
 # proportion of municipalities with religious names
 nrow(subset(munis, name_origin %like% 'Nat')) / nrow(munis)
 
+consolidated <- munis[, .(total = .N,
+                            ind = sum(name_origin %like% 'Ind'),
+                            rel = sum(name_origin %like% 'Rel'),
+                          nat = sum(name_origin %like% 'Nat'),
+                          oth = sum(name_origin %like% 'Other')
+), by=abbrev_state ]
 
-########### prepare Plot data ------------------------------------------------------------------
+# add proportions
+consolidated[, ind_prop := round( ind / total, digits = 2)]
+consolidated[, rel_prop := round( rel / total, digits = 2)]
+consolidated[, nat_prop := round( nat / total, digits = 2)]
+consolidated[, oth_prop := round( oth / total, digits = 2)]
+
+# sort
+consolidated <- consolidated[order(ind_prop, rel_prop, nat_prop)]
+consolidated
+
+
+
+
+########### prepare data for Plot munis ------------------------------------------------------------------
 
 # back to sf
 munis_sf <- st_sf(munis)
@@ -471,15 +489,9 @@ munis_sf <- st_sf(munis)
 munis_df <- sfheaders::sf_to_df(munis,fill = T)
 
 
-library(ggridges)
 
-ggplot() +
-  geom_density(data = munis, aes(count, color=name_origin))
 
-ggplot() +
-geom_bar(data = munis, aes(name_origin))
-
-########### Plot ------------------------------------------------------------------
+########### Plot munis ------------------------------------------------------------------
 
 temp_fig <- ggplot() +
             geom_sf(data=states, color='gray', fill='gray95', size=.2) +
@@ -506,10 +518,6 @@ temp_fig2 <-ggplot() +
 ggsave(temp_fig2, filename = './figures/name_origins_municipalities_br_denisty.png',
        width = 16, height = 16, units = 'cm', dpi=200)
 
-  
-  
-  
-  
 
 # Separados
 table(munis$name_origin)
@@ -519,4 +527,59 @@ ggplot() +
   geom_sf(data=states, color='gray', fill='gray95', size=.2) +
   geom_pointdensity( data=temp_df, aes(x=x,y=y), size=.1, alpha=.5) +
   scale_color_viridis_c() +
-  theme_mini
+  theme_minimal()
+
+  
+########### Map states ------------------------------------------------------------------
+
+states <- merge(states, consolidated, by='abbrev_state')  
+head(states)
+
+fig_ind <- ggplot() +
+            geom_sf(data=states, color='gray90', aes(fill=ind_prop)) +
+            scale_fill_distiller(palette = 'Greens',direction = 1,
+                                 name= 'indígena',labels = scales::percent_format(accuracy = 1)) +
+            # scale_fill_viridis_c(name= 'indígena',labels = scales::percent_format(accuracy = 1)) +
+            labs(title = "Proporção de municipios com nome de origem indígena",
+                 caption = "Image by @UrbanDemog") +
+            theme_void() +
+            theme(plot.background = element_rect(fill = "white", color="white"))
+
+fig_rel<- ggplot() +
+          geom_sf(data=states, color='gray90', aes(fill=rel_prop)) +
+          scale_fill_distiller(palette = 'Oranges',direction = 1,
+                               name= 'religiosa',labels = scales::percent_format(accuracy = 1)) +
+            # scale_fill_viridis_c(option = 'cividis', name= 'religioso',labels = scales::percent_format(accuracy = 1)) +
+            labs(title = "Proporção de municipios com nome de origem religiosa",
+                 caption = "Image by @UrbanDemog") +
+            theme_void() +
+            theme(plot.background = element_rect(fill = "white", color="white"))
+
+fig_nat <- ggplot() +
+            geom_sf(data=states, color='gray90', aes(fill=nat_prop )) +
+            scale_fill_distiller(palette = 'Purples',direction = 1,
+                                 name= 'natureza',labels = scales::percent_format(accuracy = 1)) +
+            # scale_fill_viridis_c(option = 'cividis', name= 'religioso',labels = scales::percent_format(accuracy = 1)) +
+            labs(title = "Proporção de municipios com nome relacionado a natureza",
+                   caption = "Image by @UrbanDemog") +
+            theme_void() +
+            theme(plot.background = element_rect(fill = "white", color="white"))
+
+ggsave(fig_rel, filename = './figures/states_rel.png', width = 16, height = 14, units = 'cm', dpi=200)
+ggsave(fig_ind, filename = './figures/states_ind.png', width = 16, height = 14, units = 'cm', dpi=200)
+ggsave(fig_nat, filename = './figures/states_nat.png', width = 16, height = 14, units = 'cm', dpi=200)
+
+
+
+### bar plot states ---------------------
+
+
+### random ---------------------
+# rio
+nrow( subset(munis, name_muni %like% 'Rio|Ribeir' ) ) / nrow(munis)
+
+# cidades colônias
+nrow( subset(munis, name_muni %like% 'Nova|Novo' ) ) / nrow(munis)
+
+
+
