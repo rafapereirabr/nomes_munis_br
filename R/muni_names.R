@@ -185,6 +185,7 @@ length(code_rel)
 
 pol1 <- c('Presidente', 'Senador', 'Senadora', 
           'Deputado', 'Deputada', 
+          'Vereador', 'Vereadora',
           'Prefeito', 'Prefeita',
           'Juiz', 'Juiza',
           'Embaixador', 'Embaixadora', 'Embaixatriz' )
@@ -206,6 +207,7 @@ pol <- c( 'Rei', 'Rainha', 'Barão',  'Baronesa',
           'Imperador', 'Imperatriz',
           
           'Marechal', 'General', 'Coronel', 
+          'Almirante',
           'Sargento', 'capitão', 
           'Comandante', 'Tenente', 'Soldado'
         )
@@ -594,5 +596,5 @@ nrow( subset(munis, name_muni %like% 'Rio|Ribeir' ) ) / nrow(munis)
 # cidades colônias
 nrow( subset(munis, name_muni %like% 'Nova|Novo' ) ) / nrow(munis)
 
-subset(munis, name_muni %like% 'Maripá' )
+subset(munis, name_muni %like% 'Xer' )
 
